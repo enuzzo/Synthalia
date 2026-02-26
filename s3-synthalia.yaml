@@ -85,26 +85,25 @@ light:
           name: "Interactive Candy Cane"
           update_interval: 16ms
           lambda: |-
-            static float current_pos = 0;
-            static float auto_pos = 0;
-            
+            static float phase = 0.0f;
+            static float auto_phase = 0.0f;
+
             if (id(hand_present)) {
                float target = id(hand_position) * it.size();
-               current_pos += (target - current_pos) * 0.005; 
-               auto_pos = current_pos; 
+               phase += (target - phase) * 0.08f;
+               auto_phase = phase;
             } else {
-               auto_pos += 0.03; 
-               current_pos = auto_pos;
+               auto_phase += 0.12f;
+               phase = auto_phase;
             }
-            
-            int stripe_width = 25; 
+
+            const float stripe_period = 36.0f;  // distanza tra due "picchi" rossi
+            const float k = 2.0f * 3.14159265f / stripe_period;
             for (int i = 0; i < it.size(); i++) {
-              int pos = (i + (int)current_pos) % (stripe_width * 2);
-              if (pos < stripe_width) {
-                 it[i] = Color(255, 0, 0); 
-              } else {
-                 it[i] = Color(255, 255, 255); 
-              }
+              float wave = 0.5f + 0.5f * sinf((i + phase) * k);  // 0..1 continuo
+              float blend = wave * wave * (3.0f - 2.0f * wave); // smoothstep
+              uint8_t gb = (uint8_t)(255.0f * (1.0f - blend));
+              it[i] = Color(255, gb, gb);  // rosso <-> bianco con gradiente morbido
             }
 
       # -----------------------------------------------------
@@ -388,14 +387,16 @@ sensor:
              return; 
           }
           
+          const int knob_step_brightness = 6;
+          const float knob_step_hue = 6.0f;
           auto call = id(main_strip).turn_on();
-          call.set_transition_length(100);
+          call.set_transition_length(120);
           if (id(current_mode) == 0) {
-            id(local_brightness) += 15;
+            id(local_brightness) += knob_step_brightness;
             if (id(local_brightness) > 255) id(local_brightness) = 255;
             call.set_brightness(id(local_brightness) / 255.0);
           } else {
-            id(local_hue) += 15.0;
+            id(local_hue) += knob_step_hue;
             if (id(local_hue) >= 360.0) id(local_hue) -= 360.0;
             float h = id(local_hue);
             float x_color = (1.0 - fabs(fmod(h / 60.0, 2.0) - 1.0));
@@ -418,20 +419,22 @@ sensor:
              return;
           }
           
+          const int knob_step_brightness = 6;
+          const float knob_step_hue = 6.0f;
           if (id(current_mode) == 0) {
-            id(local_brightness) -= 15;
+            id(local_brightness) -= knob_step_brightness;
             if (id(local_brightness) <= 0) {
                id(local_brightness) = 0;
                id(main_strip).turn_off().perform();
                return;
             }
           } else {
-            id(local_hue) -= 15.0;
+            id(local_hue) -= knob_step_hue;
             if (id(local_hue) < 0.0) id(local_hue) += 360.0;
           }
           
           auto call = id(main_strip).turn_on();
-          call.set_transition_length(100);
+          call.set_transition_length(120);
           if (id(current_mode) == 0) {
              call.set_brightness(id(local_brightness) / 255.0);
           } else {
