@@ -60,3 +60,30 @@ Rule: this file is append-only. Never add secrets (use placeholders like `<WIFI_
   - Need user GitHub repo URL (or username/repo name) to configure `origin` and push.
 - Prevention notes for next session:
   - Keep commit messages in English and re-check ignored local folders before first public push.
+
+### 2026-02-26 22:29 (local)
+- Goal: publish repository online and apply baseline GitHub hardening.
+- Initial context: local repo ready, user authenticated with GitHub CLI.
+- Changes made:
+  - Remote/public publish: `https://github.com/enuzzo/Synthalia`
+  - GitHub settings: description, topics, issues enabled, secret scanning + push protection
+  - Branch protection on `main`:
+    - PR review required (1 approval)
+    - stale reviews dismissed on new commits
+    - last push approval required
+    - force-push disabled
+    - branch deletion disabled
+    - conversation resolution required
+  - `README.md`
+  - `LICENSE`
+- Errors encountered:
+  - Symptom: GitHub API unavailable in sandboxed mode.
+  - Root cause: network-restricted execution context.
+  - Applied fix: reran GitHub CLI operations with escalated permissions.
+- Checks performed:
+  - Command: `gh api repos/enuzzo/Synthalia/branches/main/protection`
+  - Result: branch protection active with expected policy.
+- Residual risks / follow-up:
+  - Pushes to `main` now require PR flow; direct pushes are blocked by design.
+- Prevention notes for next session:
+  - Open feature branches + PRs for future changes, or adjust protection policy if solo workflow becomes too strict.

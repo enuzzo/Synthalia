@@ -1,5 +1,9 @@
 # Synthalia
 
+[![ESPHome](https://img.shields.io/badge/ESPHome-2025.2.2-000000?style=for-the-badge&logo=esphome)](https://esphome.io/)
+[![Status](https://img.shields.io/badge/Status-Works_on_my_LED_strip-ff6b6b?style=for-the-badge)](#quick-start)
+[![License](https://img.shields.io/badge/License-MIT-00b894?style=for-the-badge)](./LICENSE)
+
 > **A 5m ESP32-S3 light instrument** for people who say  
 > _"it's vibe coded"_ and then still tune timing constants like a maniac.
 
@@ -16,6 +20,9 @@
 Yes, the project is vibe coded.  
 No, it is not random.  
 It is **taste-driven + parameter-disciplined chaos**.
+
+Production-grade? No.  
+Performance-reviewed with excessive taste? Yes.
 
 ---
 
@@ -75,4 +82,4 @@ Roadmap target: **10 effects** total.
 
 ## License
 
-MIT (or choose your preferred license before public launch).
+MIT. Copy it, fork it, remix it, ship it.
