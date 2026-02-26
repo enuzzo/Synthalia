@@ -87,3 +87,30 @@ Rule: this file is append-only. Never add secrets (use placeholders like `<WIFI_
   - Pushes to `main` now require PR flow; direct pushes are blocked by design.
 - Prevention notes for next session:
   - Open feature branches + PRs for future changes, or adjust protection policy if solo workflow becomes too strict.
+
+### 2026-02-27 00:30 (CET)
+- Goal: add three new interactive effects and extend the EFFECTS mode selector.
+- Initial context: firmware had 4 effects (`0..3`) with valid ESPHome baseline.
+- Changes made:
+  - `s3-synthalia.yaml`
+    - Added effects:
+      - `Interactive Plasma Vortex`
+      - `Interactive Comet Rain`
+      - `Interactive Nebula Spark`
+    - Extended EFFECTS index range from `0..3` to `0..6` in encoder navigation.
+    - Updated `apply_effect` script + gesture log labels for the new effect IDs.
+    - Updated boot log string to "7D EFFECTS EDITION".
+  - `README.md`
+    - Updated effects count from 4 to 7 and added short descriptions for effects 4-6.
+    - Updated roadmap progress from 4/10 to 7/10.
+- Errors encountered:
+  - Symptom: none blocking.
+  - Root cause: n/a.
+  - Applied fix: n/a.
+- Checks performed:
+  - Command: `python3 -m esphome config s3-synthalia.yaml`
+  - Result: `INFO Configuration is valid!`
+- Residual risks / follow-up:
+  - Visual tuning of parameters (speed, trail density, sparkle intensity) should be done live on hardware.
+- Prevention notes for next session:
+  - Keep validating with `python3 -m esphome config` after each lambda-heavy change before OTA.

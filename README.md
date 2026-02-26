@@ -94,7 +94,7 @@ Synthalia has three operating modes, cycled by clicking the encoder button:
 
 ## Effects
 
-Four hand-interactive effects, each running its own physics simulation inside an `addressable_lambda`. Every one responds to the ToF sensor in real time.
+Seven hand-interactive effects, each running its own simulation inside an `addressable_lambda`. Every one responds to the ToF sensor in real time.
 
 ### 0. Interactive Candy Cane
 
@@ -111,6 +111,18 @@ Six independent drops with velocity, direction, and trail rendering. The hand pr
 ### 3. Interactive Fire
 
 Heat-diffusion fire simulation with hand-aware flame height control. Each frame: cool the heat map, diffuse upward `(h[k] + 2*h[k-1] + h[k-2]) * 0.25`, spark at the base (7.5% chance, 1-2 sparks), temporally smooth everything (`alpha = 0.22`), then map heat to a three-stage color ramp (dark red -> orange -> yellow -> pale). Hand position controls flame height with a secondary dimming channel. Runs at 30ms intervals because fire doesn't need to be *that* fast. Idle mode gently oscillates flame height between 32-62% for a living, breathing quality.
+
+### 4. Interactive Plasma Vortex
+
+Layered sine fields create a flowing plasma gradient with continuous hue drift. Hand position controls vortex center and distortion intensity.
+
+### 5. Interactive Comet Rain
+
+Seven additive comets with variable trail length and velocity. Hand position increases speed/trail and draws a visible control lane on the strip.
+
+### 6. Interactive Nebula Spark
+
+Soft nebula cloud simulation with localized twinkle spawning. Hand position moves and widens the active sparkle band for a "constellation sculpting" feel.
 
 > **Design philosophy:** if the effect doesn't respond to your hand in a way that makes you go *"oh, cool"* within two seconds, the parameters are wrong.
 
@@ -193,7 +205,7 @@ ESP32-S3 DevKitC-1
 
 ## Roadmap
 
-Currently **4 of 10** planned effects. The six remaining slots are reserved for whatever obsessive parameter-tuning marathon happens next.
+Currently **7 of 10** planned effects. Three slots are still open for whatever obsessive parameter-tuning marathon happens next.
 
 The hardware design is converging on the final form: 18-turn helix, frosted glass cloche, concrete base, brass knobs, ToF sensor at 45 degrees for natural hand-over interaction. Software follows the hardware -- new effects will be designed for the helical geometry, not a flat strip.
 
