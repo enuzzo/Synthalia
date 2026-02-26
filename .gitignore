@@ -1,0 +1,16 @@
+# Local secrets
+secrets.yaml
+config.h
+config.local.h
+.env
+.env.*
+
+# ESPHome artifacts
+.esphome/
+build/
+*.bin
+*.elf
+*.log
+
+# macOS
+.DS_Store
