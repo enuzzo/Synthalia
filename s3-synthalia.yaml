@@ -251,7 +251,7 @@ globals:
     initial_value: '128'
   - id: local_hue
     type: float
-    initial_value: '0.0'
+    initial_value: '-1.0'
   - id: knob_is_moving
     type: bool
     initial_value: 'false'
@@ -351,7 +351,16 @@ sensor:
 
             if (id(current_mode) == 0) {
                 id(local_brightness) = (int)(value * 255.0f + 0.5f);
-                call.set_rgb(1.0, 1.0, 1.0);
+                if (id(local_hue) >= 0.0f) {
+                    float h = id(local_hue);
+                    float x_color = (1.0f - fabsf(fmodf(h / 60.0f, 2.0f) - 1.0f));
+                    float r=0,g=0,b=0;
+                    if(h<60){r=1;g=x_color;b=0;}else if(h<120){r=x_color;g=1;b=0;}else if(h<180){r=0;g=1;b=x_color;}
+                    else if(h<240){r=0;g=x_color;b=1;}else if(h<300){r=x_color;g=0;b=1;}else{r=1;g=0;b=x_color;}
+                    call.set_rgb(r, g, b);
+                } else {
+                    call.set_rgb(1.0, 1.0, 1.0);
+                }
                 call.set_brightness(value);
                 if (value <= 0.003f) { id(main_strip).turn_off().perform(); return; }
             } else if (id(current_mode) == 1) {
@@ -394,6 +403,16 @@ sensor:
           if (id(current_mode) == 0) {
             id(local_brightness) += knob_step_brightness;
             if (id(local_brightness) > 255) id(local_brightness) = 255;
+            if (id(local_hue) >= 0.0f) {
+              float h = id(local_hue);
+              float x_color = (1.0f - fabsf(fmodf(h / 60.0f, 2.0f) - 1.0f));
+              float r=0,g=0,b=0;
+              if(h<60){r=1;g=x_color;b=0;}else if(h<120){r=x_color;g=1;b=0;}else if(h<180){r=0;g=1;b=x_color;}
+              else if(h<240){r=0;g=x_color;b=1;}else if(h<300){r=x_color;g=0;b=1;}else{r=1;g=0;b=x_color;}
+              call.set_rgb(r, g, b);
+            } else {
+              call.set_rgb(1.0, 1.0, 1.0);
+            }
             call.set_brightness(id(local_brightness) / 255.0);
           } else {
             id(local_hue) += knob_step_hue;
@@ -436,6 +455,16 @@ sensor:
           auto call = id(main_strip).turn_on();
           call.set_transition_length(120);
           if (id(current_mode) == 0) {
+             if (id(local_hue) >= 0.0f) {
+                float h = id(local_hue);
+                float x_color = (1.0f - fabsf(fmodf(h / 60.0f, 2.0f) - 1.0f));
+                float r=0,g=0,b=0;
+                if(h<60){r=1;g=x_color;b=0;}else if(h<120){r=x_color;g=1;b=0;}else if(h<180){r=0;g=1;b=x_color;}
+                else if(h<240){r=0;g=x_color;b=1;}else if(h<300){r=x_color;g=0;b=1;}else{r=1;g=0;b=x_color;}
+                call.set_rgb(r, g, b);
+             } else {
+                call.set_rgb(1.0, 1.0, 1.0);
+             }
              call.set_brightness(id(local_brightness) / 255.0);
           } else {
              float h = id(local_hue);
