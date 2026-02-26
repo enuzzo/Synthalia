@@ -73,7 +73,7 @@ Synthalia has three operating modes, cycled by clicking the encoder button:
 
 ```
                     single click              single click
-              ┌──── DIM MODE ◄──── COLOR MODE ────┐
+              ┌──── DIM MODE ◄───── COLOR MODE ────┐
               │     (default)       (hue select)   │
               │                                    │
               │         ▲ single click             │
