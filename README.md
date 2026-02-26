@@ -45,7 +45,7 @@ python3 -m esphome logs s3-synthalia.yaml --device <DEVICE_IP_OR_HOSTNAME>
 Example:
 
 ```bash
-python3 -m esphome run s3-synthalia.yaml --device 192.168.178.151
+python3 -m esphome run s3-synthalia.yaml --device <YOUR_DEVICE_IP>
 ```
 
 ---
