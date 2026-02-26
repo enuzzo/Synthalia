@@ -87,17 +87,17 @@ light:
           lambda: |-
             static float phase = 0.0f;
             static float auto_phase = 0.0f;
-
+            
             if (id(hand_present)) {
                float target = id(hand_position) * it.size();
-               phase += (target - phase) * 0.08f;
+               phase += (target - phase) * 0.05f;  // più morbido sul gesto
                auto_phase = phase;
             } else {
-               auto_phase += 0.12f;
+               auto_phase += 0.09f;  // scorrimento idle più vellutato
                phase = auto_phase;
             }
 
-            const float stripe_period = 36.0f;  // distanza tra due "picchi" rossi
+            const float stripe_period = 52.0f;  // bande più ampie, meno "ingranaggio"
             const float k = 2.0f * 3.14159265f / stripe_period;
             for (int i = 0; i < it.size(); i++) {
               float wave = 0.5f + 0.5f * sinf((i + phase) * k);  // 0..1 continuo
@@ -145,56 +145,7 @@ light:
             }
 
       # -----------------------------------------------------
-      # EFFETTO 2: FUOCO (Jedi Blue Fire Mode)
-      # -----------------------------------------------------
-      - addressable_lambda:
-          name: "Interactive Fire"
-          update_interval: 30ms
-          lambda: |-
-            int num_leds = it.size();
-            static float current_height = num_leds * 0.5;
-            float target_height = num_leds * 0.5;
-            bool is_jedi = id(hand_present);
-            
-            if (is_jedi) {
-                target_height = id(hand_position) * num_leds;
-                if (target_height < 15) target_height = 15; 
-            } else {
-                static int timer = 0;
-                static float rand_h = 0;
-                if (timer++ > 5) {
-                    rand_h = random(0, (int)(num_leds * 0.3));
-                    timer = 0;
-                }
-                target_height = (num_leds * 0.3) + rand_h; 
-            }
-            
-            current_height += (target_height - current_height) * (is_jedi ? 0.15 : 0.05);
-            
-            for (int i = 0; i < num_leds; i++) {
-                float heat = 0.0;
-                if (i <= current_height) {
-                    heat = 1.0 - ((float)i / current_height);
-                    float flicker = random(0, 100) / 100.0;
-                    if (heat < 0.8) heat -= flicker * 0.4;
-                }
-                if (heat < 0.0) heat = 0.0;
-                
-                int r = 0, g = 0, b = 0;
-                if (is_jedi) {
-                   if (heat > 0.9) { r = 150; g = 200; b = 255; } 
-                   else if (heat > 0.4) { r = 100; g = 50; b = 255; } 
-                   else { r = 0; g = 0; b = heat * 255; } 
-                } else {
-                   if (heat > 0.9) { r = 255; g = 255; b = 150; } 
-                   else if (heat > 0.4) { r = 255; g = (heat - 0.4) * (255.0 / 0.6); b = 0; } 
-                   else { r = heat * (255.0 / 0.4); g = 0; b = 0; }
-                }
-                it[i] = Color(r, g, b);
-            }
-
-      # -----------------------------------------------------
-      # EFFETTO 3: MATRIX DNA (Rimbalzo Antigravità)
+      # EFFETTO 2: MATRIX DNA (Interazione Mano Potenziata)
       # -----------------------------------------------------
       - addressable_lambda:
           name: "Interactive Matrix"
@@ -202,38 +153,205 @@ light:
           lambda: |-
             int num_leds = it.size();
             static float drops[6] = {50, 100, 150, 200, 250, 300};
-            static float speeds[6] = {0.3, 0.5, 0.2, 0.4, 0.6, 0.3};
+            static float speeds[6] = {0.30f, 0.48f, 0.24f, 0.40f, 0.56f, 0.34f};
             static int dirs[6] = {-1, -1, -1, -1, -1, -1};
-            
-            for(int i=0; i<num_leds; i++) {
-                it[i].fade_to_black(20);
+            static float wall_smooth = -1.0f;
+            const float speed_scale = 0.85f;  // ~15% più lento
+
+            for (int i = 0; i < num_leds; i++) {
+                it[i].fade_to_black(24);
             }
-            
-            float floor_pos = -1;
-            if (id(hand_present)) floor_pos = id(hand_position) * num_leds;
-            
-            for (int j=0; j<6; j++) {
-                drops[j] += speeds[j] * dirs[j];
-                
-                if (dirs[j] == -1 && floor_pos >= 0 && drops[j] <= floor_pos) {
-                    dirs[j] = 1; 
-                    int p = (int)floor_pos;
-                    if (p >= 0 && p < num_leds) it[p] = Color(255, 255, 255); 
-                } 
-                else if (dirs[j] == -1 && drops[j] < 0) {
+
+            auto add_px = [&](int idx, uint8_t r, uint8_t g, uint8_t b) {
+                int nr = it[idx].get_red() + r;
+                int ng = it[idx].get_green() + g;
+                int nb = it[idx].get_blue() + b;
+                if (nr > 255) nr = 255;
+                if (ng > 255) ng = 255;
+                if (nb > 255) nb = 255;
+                it[idx] = Color(nr, ng, nb);
+            };
+
+            float wall_pos = -1.0f;
+            if (id(hand_present)) {
+                float target_wall = id(hand_position) * (num_leds - 1);
+                if (wall_smooth < 0.0f) wall_smooth = target_wall;
+                wall_smooth += (target_wall - wall_smooth) * 0.30f;
+                wall_pos = wall_smooth;
+
+                // Muro visivo della mano: più largo e più evidente.
+                int center = (int)wall_pos;
+                for (int d = -10; d <= 10; d++) {
+                    int p = center + d;
+                    if (p < 0 || p >= num_leds) continue;
+                    float dist = fabsf((float)d);
+                    float intensity = 1.0f - (dist / 10.0f);
+                    if (intensity < 0.0f) intensity = 0.0f;
+                    uint8_t g = (uint8_t)(80.0f + 120.0f * intensity);
+                    uint8_t b = (uint8_t)(120.0f + 135.0f * intensity);
+                    add_px(p, 0, g, b);
+                }
+            } else {
+                wall_smooth = -1.0f;
+            }
+
+            for (int j = 0; j < 6; j++) {
+                float speed = speeds[j] * speed_scale;
+
+                if (dirs[j] == -1 && wall_pos >= 0.0f) {
+                    float dist_to_wall = drops[j] - wall_pos;
+                    if (dist_to_wall > 0.0f && dist_to_wall < 14.0f) {
+                        float t = 1.0f - (dist_to_wall / 14.0f);
+                        speed *= (1.0f - 0.45f * t);  // rallenta avvicinandosi alla mano
+                    }
+                }
+
+                drops[j] += speed * dirs[j];
+
+                if (dirs[j] == -1 && wall_pos >= 0.0f && drops[j] <= wall_pos) {
+                    dirs[j] = 1;
+                    drops[j] = wall_pos + 0.2f;
+                    int p = (int)wall_pos;
+                    for (int d = -4; d <= 4; d++) {
+                        int pp = p + d;
+                        if (pp < 0 || pp >= num_leds) continue;
+                        float intensity = 1.0f - (fabsf((float)d) / 4.5f);
+                        if (intensity < 0.0f) intensity = 0.0f;
+                        add_px(pp, (uint8_t)(180.0f * intensity), (uint8_t)(220.0f * intensity), (uint8_t)(255.0f * intensity));
+                    }
+                } else if (dirs[j] == -1 && drops[j] < 0) {
                     drops[j] = num_leds + random(0, 50);
-                    speeds[j] = random(2, 6) / 10.0;
+                    speeds[j] = random(2, 6) / 10.0f;
+                } else if (dirs[j] == 1 && drops[j] >= num_leds) {
+                    dirs[j] = -1;
+                    drops[j] = num_leds + random(0, 40);
                 }
-                else if (dirs[j] == 1 && drops[j] >= num_leds) {
-                    dirs[j] = -1; 
-                    drops[j] = num_leds;
-                }
-                
+
                 int p = (int)drops[j];
-                if (p >= 0 && p < num_leds) {
-                    if (dirs[j] == -1) it[p] = Color(0, 255, 50); 
-                    else it[p] = Color(0, 200, 255); 
+                for (int t = 0; t < 3; t++) {
+                    int pp = p - t * dirs[j];
+                    if (pp < 0 || pp >= num_leds) continue;
+                    float trail = 1.0f - (t * 0.35f);
+                    if (trail < 0.0f) trail = 0.0f;
+                    if (dirs[j] == -1) {
+                        add_px(pp, 0, (uint8_t)(255.0f * trail), (uint8_t)(40.0f * trail));
+                    } else {
+                        add_px(pp, 0, (uint8_t)(170.0f * trail), (uint8_t)(255.0f * trail));
+                    }
                 }
+            }
+
+      # -----------------------------------------------------
+      # EFFETTO 3: FUOCO (Morbido e Reattivo)
+      # -----------------------------------------------------
+      - addressable_lambda:
+          name: "Interactive Fire"
+          update_interval: 30ms
+          lambda: |-
+            const int max_leds = 300;
+            int n = it.size();
+            if (n > max_leds) n = max_leds;
+
+            static float heat[max_leds] = {0.0f};
+            static float shown[max_leds] = {0.0f};
+            static float height_ctrl = 0.42f;
+            static float dim_ctrl = 0.82f;
+            static float idle_height_target = 0.42f;
+            static int idle_tick = 0;
+
+            if (id(hand_present)) {
+                float t = id(hand_position);
+                if (t < 0.0f) t = 0.0f;
+                if (t > 1.0f) t = 1.0f;
+                // Controllo principalmente l'altezza fiamma (più diretto).
+                height_ctrl += (t - height_ctrl) * 0.18f;
+                // E in parallelo un dimming leggero per rendere il gesto più evidente.
+                float dim_target = 0.45f + t * 0.55f;  // 45%..100%
+                dim_ctrl += (dim_target - dim_ctrl) * 0.16f;
+            } else {
+                if (idle_tick++ > 45) {
+                    idle_tick = 0;
+                    idle_height_target = 0.32f + (random(0, 31) / 100.0f);  // 0.32..0.62
+                }
+                height_ctrl += (idle_height_target - height_ctrl) * 0.03f;
+                float idle_dim_target = 0.80f + height_ctrl * 0.12f;
+                dim_ctrl += (idle_dim_target - dim_ctrl) * 0.04f;
+            }
+
+            float flame_height = (0.14f + height_ctrl * 0.86f) * n;
+            float cooling_base = 0.006f;
+            float cooling_var = 0.006f;
+            float spark_strength = 0.22f;
+            float spark_chance = 0.075f;
+            int spark_zone = 7;
+            if (spark_zone > n) spark_zone = n;
+
+            // 1) Raffreddamento dolce.
+            for (int i = 0; i < n; i++) {
+                float cool = cooling_base + (random(0, 100) / 100.0f) * cooling_var;
+                heat[i] -= cool;
+                if (heat[i] < 0.0f) heat[i] = 0.0f;
+            }
+
+            // 2) Diffusione verticale.
+            for (int k = n - 1; k >= 2; k--) {
+                heat[k] = (heat[k] + heat[k - 1] * 2.0f + heat[k - 2]) * 0.25f;
+            }
+
+            // 3) Poche scintille alla base (niente flash aggressivi).
+            if (random(0, 1000) < (int)(spark_chance * 1000.0f)) {
+                int sparks = (random(0, 1000) < 60) ? 2 : 1;
+                for (int s = 0; s < sparks; s++) {
+                    int y = random(0, spark_zone);
+                    float add = spark_strength * (0.78f + random(0, 20) / 100.0f);
+                    heat[y] += add;
+                    if (heat[y] > 1.0f) heat[y] = 1.0f;
+                }
+            }
+
+            // 4) Smussa temporalmente per eliminare micro-lampeggi.
+            for (int i = 0; i < n; i++) {
+                shown[i] += (heat[i] - shown[i]) * 0.22f;
+            }
+
+            // 5) Mappa calore -> colore fuoco, con envelope di altezza.
+            for (int i = 0; i < n; i++) {
+                float h = shown[i];
+                float pos = (flame_height > 1.0f) ? ((float)i / flame_height) : 1.0f;
+                float envelope = 1.0f;
+                if (pos > 1.0f) {
+                    envelope = 1.0f - (pos - 1.0f) * 3.4f;
+                    if (envelope < 0.0f) envelope = 0.0f;
+                } else {
+                    envelope = 1.0f - pos * 0.12f;
+                }
+                h *= envelope;
+                if (h < 0.0f) h = 0.0f;
+                if (h > 1.0f) h = 1.0f;
+
+                uint8_t r = 0, g = 0, b = 0;
+                if (h < 0.40f) {
+                    float t = h / 0.40f;
+                    r = (uint8_t)(35.0f + 175.0f * t);
+                    g = (uint8_t)(4.0f + 36.0f * t);
+                } else if (h < 0.80f) {
+                    float t = (h - 0.40f) / 0.40f;
+                    r = (uint8_t)(210.0f + 45.0f * t);
+                    g = (uint8_t)(40.0f + 140.0f * t);
+                } else {
+                    float t = (h - 0.80f) / 0.20f;
+                    r = 255;
+                    g = (uint8_t)(180.0f + 75.0f * t);
+                    b = (uint8_t)(18.0f * t);
+                }
+                r = (uint8_t)((float)r * dim_ctrl);
+                g = (uint8_t)((float)g * dim_ctrl);
+                b = (uint8_t)((float)b * dim_ctrl);
+                it[i] = Color(r, g, b);
+            }
+
+            for (int i = n; i < it.size(); i++) {
+                it[i] = Color(0, 0, 0);
             }
 
 globals:
@@ -339,8 +457,8 @@ sensor:
                     int fx_id = id(current_effect);
                     const char *fx_name = "Candy Cane";
                     if (fx_id == 1) fx_name = "Aurora";
-                    else if (fx_id == 2) fx_name = "Fire";
-                    else if (fx_id == 3) fx_name = "Matrix";
+                    else if (fx_id == 2) fx_name = "Matrix";
+                    else if (fx_id == 3) fx_name = "Fire";
                     ESP_LOGI("GESTURE", "FX %.1f cm | raw=%d%% filt=%d%% -> %s", dist * 100.0f, raw_pct, value_pct, fx_name);
                 }
             }
@@ -533,11 +651,11 @@ script:
              ESP_LOGI("FX", "🎨 Attivato Effetto: AURORA");
              call.set_effect("Interactive Aurora");
           } else if (id(current_effect) == 2) {
-             ESP_LOGI("FX", "🎨 Attivato Effetto: FIRE (Fuoco Vivo)");
-             call.set_effect("Interactive Fire");
-          } else if (id(current_effect) == 3) {
              ESP_LOGI("FX", "🎨 Attivato Effetto: MATRIX DNA");
              call.set_effect("Interactive Matrix");
+          } else if (id(current_effect) == 3) {
+             ESP_LOGI("FX", "🎨 Attivato Effetto: FIRE (Morbido)");
+             call.set_effect("Interactive Fire");
           }
           call.perform();
 
