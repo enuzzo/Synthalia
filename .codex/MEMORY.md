@@ -1,43 +1,43 @@
 # Project Memory (Synthalia)
 
-## Prime direttive
-- Non scrivere mai segreti in chiaro in file versionati, output o commit message.
-- Prima di modifiche firmware, validare sempre con `python3 -m esphome config s3-synthalia.yaml`.
-- Per OTA/log usare device esplicito (`--device <ip|hostname>`), non assumere auto-discovery.
-- Preferire modifiche minime e verificabili, con rollback semplice.
-- Aggiornare questa memoria solo con regole stabili e riusabili.
+## Core Directives
+- Never write secrets in plaintext in tracked files, output, or commit messages.
+- Before firmware edits, always validate with `python3 -m esphome config s3-synthalia.yaml`.
+- For OTA/logs, always pass an explicit device (`--device <ip|hostname>`).
+- Prefer minimal, testable changes with easy rollback.
+- Update this memory only with stable, reusable rules.
 
-## Preferenze di lavoro
-- Risposte operative, brevi, in italiano.
-- Prima sicurezza/coerenza, poi ottimizzazioni.
-- Quando possibile: patch piccole + test immediato OTA/log.
-- Evitare refactor ampi senza richiesta esplicita.
+## Working Preferences
+- Practical, concise communication.
+- Security and consistency first, optimization second.
+- Prefer small patches + immediate OTA/log verification.
+- Avoid broad refactors unless explicitly requested.
 
-## Decisioni tecniche consolidate
-- Stack: ESPHome su `esp32-s3-devkitc-1` (framework Arduino).
-- Config principale: `s3-synthalia.yaml`.
-- Segreti runtime: `secrets.yaml` richiamato con `!secret`.
-- Comandi standard:
-  - Validazione: `python3 -m esphome config s3-synthalia.yaml`
-  - Build+OTA: `python3 -m esphome run s3-synthalia.yaml --device <IP>`
-  - Log live: `python3 -m esphome logs s3-synthalia.yaml --device <IP>`
+## Consolidated Technical Decisions
+- Stack: ESPHome on `esp32-s3-devkitc-1` (Arduino framework).
+- Main config: `s3-synthalia.yaml`.
+- Runtime secrets: local `secrets.yaml` referenced via `!secret`.
+- Standard commands:
+  - Validate: `python3 -m esphome config s3-synthalia.yaml`
+  - Build + OTA: `python3 -m esphome run s3-synthalia.yaml --device <IP>`
+  - Live logs: `python3 -m esphome logs s3-synthalia.yaml --device <IP>`
 
-## Sicurezza e segreti
-- I segreti vivono in `secrets.yaml` (file locale non versionato).
-- `secrets.yaml` è escluso da git tramite `.gitignore`.
-- I file versionati devono contenere solo riferimenti (`!secret ...`), mai valori sensibili.
-- Se in futuro compare `config.h`, mantenerlo locale ignorato e usare template pulito versionato (es. `config.example.h`).
+## Security And Secrets
+- Secrets live in local `secrets.yaml` (not versioned).
+- `secrets.yaml` is excluded via `.gitignore`.
+- Tracked files must contain references (`!secret ...`), never sensitive values.
+- If `config.h` is introduced, keep it local/ignored and version only a clean template (`config.example.h`).
 
-## Gotcha ricorrenti
-- `esphome` potrebbe non essere nel `PATH`: usare `python3 -m esphome`.
-- `external_components` da GitHub richiede rete attiva (altrimenti validazione fallisce).  
-- Dopo rename nodo, primo OTA può richiedere IP diretto invece di hostname.  
-- IPOTESI: sensore gesture può sembrare "lento" se filtri/transition sono troppo aggressivi.
+## Recurring Gotchas
+- `esphome` may not be in `PATH`: use `python3 -m esphome`.
+- `external_components` from GitHub needs network access.
+- After node rename, first OTA may require direct IP instead of hostname.
+- HYPOTHESIS: gesture can feel slow if filters/transitions are too aggressive.
 
-## Checklist pre-flight
-- [ ] Ho letto questa MEMORY e le ultime 2 entry di `SESSION_LOG.md`.
-- [ ] Nessun segreto in chiaro nelle modifiche o nei commenti.
-- [ ] `secrets.yaml` resta ignorato e non staged.
-- [ ] `python3 -m esphome config s3-synthalia.yaml` passa.
-- [ ] Se tocco gesture/luci, faccio test OTA + logs.
-- [ ] Aggiorno `SESSION_LOG.md` a fine sessione.
+## Pre-Flight Checklist
+- [ ] Read this `MEMORY.md` and the last 2 entries of `SESSION_LOG.md`.
+- [ ] No plaintext secrets in changes or notes.
+- [ ] `secrets.yaml` is still ignored and not staged.
+- [ ] `python3 -m esphome config s3-synthalia.yaml` passes.
+- [ ] If gesture/light logic changed: run OTA + logs test.
+- [ ] Append session notes to `SESSION_LOG.md` at end of work.

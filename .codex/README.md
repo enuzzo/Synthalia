@@ -1,22 +1,22 @@
-# .codex usage
+# .codex Usage
 
-Questa cartella contiene memoria operativa di progetto, senza dati sensibili.
+This folder stores project memory and operational notes, with no sensitive data.
 
-## Differenza tra file
-- `MEMORY.md`: regole stabili, decisioni consolidate, checklist pre-flight.
-- `SESSION_LOG.md`: diario cronologico append-only di sessioni, errori e correzioni.
+## File Roles
+- `MEMORY.md`: stable rules, consolidated decisions, and pre-flight checklist.
+- `SESSION_LOG.md`: append-only chronological log of sessions, errors, and fixes.
 
-## Rituale inizio sessione
-- Leggi `MEMORY.md`.
-- Leggi le ultime 2 entry di `SESSION_LOG.md`.
-- Allinea il piano di lavoro a quelle regole prima di toccare codice/config.
+## Start-Of-Session Ritual
+- Read `MEMORY.md`.
+- Read the last 2 entries in `SESSION_LOG.md`.
+- Align planned changes with those rules before touching code/config.
 
-## Rituale fine sessione
-- Appendi una nuova entry in `SESSION_LOG.md` (obiettivo, errori, fix, verifiche, follow-up).
-- Aggiorna `MEMORY.md` solo se emerge una regola stabile e riusabile.
-- Mantieni i cambi minimali e verificati.
+## End-Of-Session Ritual
+- Append a new entry in `SESSION_LOG.md` (goal, errors, fixes, checks, follow-ups).
+- Update `MEMORY.md` only when a rule is stable and reusable.
+- Keep changes minimal and verified.
 
-## Sicurezza (obbligatoria)
-- Divieto assoluto di segreti in `.codex/*`.
-- Niente password/token/API key in output o commit message.
-- I segreti restano in file locali ignorati da git (es. `secrets.yaml`).
+## Security (Mandatory)
+- Absolute ban on secrets in `.codex/*`.
+- No passwords/tokens/API keys in output or commit messages.
+- Secrets stay only in local git-ignored files (e.g. `secrets.yaml`).
