@@ -16,6 +16,4 @@ build/
 .DS_Store
 
 # Local reference material (not part of firmware repo)
-Collegamento elettrico/
-Concepts/
-ESP32-S3/
+refs/

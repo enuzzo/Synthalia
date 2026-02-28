@@ -1,13 +1,14 @@
 # .codex Usage
 
-This folder stores project memory and operational notes, with no sensitive data.
+This folder is Codex-specific operational context. Stable, public project knowledge now lives in `knowledge/` (the canonical cross-provider layer).
 
 ## File Roles
-- `MEMORY.md`: stable rules, consolidated decisions, and pre-flight checklist.
-- `SESSION_LOG.md`: append-only chronological log of sessions, errors, and fixes.
+- `MEMORY.md`: Codex-specific rules and pre-flight checklist. Stable project facts live in `knowledge/PROJECT_KNOWLEDGE.md`.
+- `SESSION_LOG.md`: append-only chronological log of sessions, errors, and fixes (private operational context).
 
 ## Start-Of-Session Ritual
-- Read `MEMORY.md`.
+- Read `knowledge/PROJECT_KNOWLEDGE.md` and the latest entries in `knowledge/DECISIONS.md` (canonical source of truth).
+- Read `MEMORY.md` for Codex-specific behavioral rules.
 - Read the last 2 entries in `SESSION_LOG.md`.
 - Align planned changes with those rules before touching code/config.
 
