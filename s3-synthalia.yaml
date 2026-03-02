@@ -12,7 +12,7 @@ esphome:
           id(boot_rainbow).execute();
 
 external_components:
-  - source: github://soldierkam/vl53l1x_sensor
+  - source: github://soldierkam/vl53l1x_sensor@bb0b6adae975c01714b19921d16de07f0bd6e2ba
     refresh: 0s
 
 esp32:
@@ -28,7 +28,7 @@ logger:
   level: INFO
   logs:
     sensor: INFO
-    vl53l1x_sensor: WARN 
+    vl53l1x: WARN
 
 wifi:
   ssid: !secret wifi_ssid
@@ -691,7 +691,7 @@ sensor:
             const float max_dist_m = 0.70f;      // 70 cm => 100%
             const float release_dist_m = 0.78f;  // oltre, mano assente
 
-            bool no_hand = std::isnan(x) || x > release_dist_m;
+            bool no_hand = std::isnan(x) || x <= 0.001f || x > release_dist_m;
 
             if (no_hand) {
                if (id(hand_present)) {

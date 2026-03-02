@@ -67,3 +67,11 @@ Entry format:
 - Context: `.codex/` was Codex-specific; project needed a portable, provider-agnostic shared knowledge layer accessible to any AI assistant or human contributor.
 - Decision: Created `knowledge/` with four canonical files (README, ASSISTANT_BOOTSTRAP_PROMPT, PROJECT_KNOWLEDGE, DECISIONS). Provider-specific configs become thin behavioral wrappers; all project facts live exclusively in `knowledge/`. `.codex/` is retained for Codex-specific operational context and the append-only SESSION_LOG.
 - Impact/Tradeoffs: Better portability, transparency, and human readability; requires discipline to keep project facts out of provider-specific configs and to maintain the data policy (no secrets, no local paths in `knowledge/`).
+
+---
+
+## 2026-03-02 - Pin VL53L1X External Component and Ignore Invalid Zero Readings
+
+- Context: Gesture control stopped working while encoder remained functional. Runtime diagnostics showed VL53L1X present on I2C but returning invalid measurements (`nan`) or `0 mm` values, causing unstable/no gesture behavior.
+- Decision: Pinned `external_components` source `soldierkam/vl53l1x_sensor` to a fixed commit and added a guard in the gesture pipeline to treat `x <= 0.001m` as no-hand/invalid input.
+- Impact/Tradeoffs: Improves reproducibility and resilience against transient invalid ToF samples; adds one defensive condition in gesture handling and requires manual commit bump when intentionally updating the external component.
