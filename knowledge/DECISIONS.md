@@ -75,3 +75,19 @@ Entry format:
 - Context: Gesture control stopped working while encoder remained functional. Runtime diagnostics showed VL53L1X present on I2C but returning invalid measurements (`nan`) or `0 mm` values, causing unstable/no gesture behavior.
 - Decision: Pinned `external_components` source `soldierkam/vl53l1x_sensor` to a fixed commit and added a guard in the gesture pipeline to treat `x <= 0.001m` as no-hand/invalid input.
 - Impact/Tradeoffs: Improves reproducibility and resilience against transient invalid ToF samples; adds one defensive condition in gesture handling and requires manual commit bump when intentionally updating the external component.
+
+---
+
+## 2026-03-03 - README Hero Uses Two Inline Renders (16:9 + 4:5)
+
+- Context: Project presentation now uses two concept renders with different aspect ratios and needed deterministic side-by-side layout on GitHub.
+- Decision: The README hero uses two inline HTML `<img>` tags with equal height (`320`), `border-radius: 5px`, and explicit spacing only between images.
+- Impact/Tradeoffs: Visual presentation is consistent and intentional; markdown remains slightly less pure due to small HTML usage.
+
+---
+
+## 2026-03-03 - Direct Push to `main` Is Current Working Flow
+
+- Context: Recent maintenance commits were pushed directly to `main`, so the previous PR-required branch-protection baseline is no longer active in practice.
+- Decision: Treat direct push to `main` as the operational default until repository protection settings are changed again.
+- Impact/Tradeoffs: Faster solo iteration; fewer merge-review guardrails compared to PR-only flow.

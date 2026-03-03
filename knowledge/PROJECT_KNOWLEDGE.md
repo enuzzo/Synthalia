@@ -8,7 +8,7 @@ Stable technical context for all assistants. Updated only for verified, reusable
 - `secrets.yaml`: runtime credentials (git-ignored, never committed).
 - `knowledge/`: shared cross-provider knowledge (public, versioned).
 - `.codex/`: operational memory and session log — see `.codex/README.md`.
-- `assets/`: concept renders and visual references.
+- `assets/`: concept renders and visual references (current hero sources: `synthalia-concept-v1-render-01.png` and `synthalia-concept-v1-render-02.png`).
 
 ## Core Stack
 
