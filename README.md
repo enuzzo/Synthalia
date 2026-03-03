@@ -9,9 +9,15 @@
 > Nobody leaves until every smoothing constant has been hand-tuned at 2 AM.
 
 <div align="center">
-<img src="assets/synthalia-concept.png" alt="Synthalia concept render — helical LED coil inside frosted glass cloche on concrete base" width="720" />
+<table>
+<tr>
+<td><img src="assets/synthalia-concept-v1-render-01.png" alt="Synthalia concept render v1 (16:9)" height="320" /></td>
+<td width="24"></td>
+<td><img src="assets/synthalia-concept-v1-render-02.png" alt="Synthalia concept render v1 (4:5)" height="320" /></td>
+</tr>
+</table>
 <br />
-<sub>Concept render. Final version: taller, 18 turns, and the gesture sensor is angled at 45° because pointing straight up is for amateurs.</sub>
+<sub>Concept renders v1 (16:9 + 4:5). Final version: taller, 18 turns, and the gesture sensor is angled at 45° because pointing straight up is for amateurs.</sub>
 </div>
 
 <br />
